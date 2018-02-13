@@ -1,5 +1,7 @@
 package com.codecool.plaza.api;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class FoodProduct extends Product {
@@ -14,6 +16,12 @@ public class FoodProduct extends Product {
     }
 
     public boolean isStillConsumable() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        Date today = new Date();
+
+        if (dateFormat.format(today).compareTo(dateFormat.format(bestBefore)) < 0) {
+            return true;
+        }
         return false;
     }
 
