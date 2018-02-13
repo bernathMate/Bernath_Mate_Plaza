@@ -43,6 +43,12 @@ public class ShopImpl implements Shop{
 
     @Override
     public Product findByName(String name) throws ShopIsClosedException {
+        List<ShopEntry> productsShopEntries = (List<ShopEntry>) products.values();
+        for (int i = 0; i < productsShopEntries.size(); i++) {
+            if (productsShopEntries.get(i).getProduct().getName().equals(name)) {
+                return productsShopEntries.get(i).getProduct();
+            }
+        }
         return null;
     }
 
