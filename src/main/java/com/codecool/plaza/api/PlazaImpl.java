@@ -9,10 +9,10 @@ public class PlazaImpl implements Plaza{
     private List<Shop> shops;
     private boolean isOpen;
 
-    public PlazaImpl(String name) {
+    public PlazaImpl(String name, boolean isOpen) {
         this.name = name;
+        this.isOpen = isOpen;
         this.shops = new ArrayList<Shop>();
-        this.isOpen = false;
     }
 
     @Override
