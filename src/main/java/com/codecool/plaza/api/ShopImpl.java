@@ -1,5 +1,6 @@
 package com.codecool.plaza.api;
 
+import java.util.List;
 import java.util.Map;
 
 public class ShopImpl implements Shop{
