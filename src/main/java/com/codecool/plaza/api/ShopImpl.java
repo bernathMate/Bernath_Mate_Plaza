@@ -12,10 +12,13 @@ public class ShopImpl implements Shop{
     private boolean isOpen;
     private Map<Long, ShopEntry> products;
 
-    public ShopImpl(String name, String owner, boolean isOpen) {
+    public ShopImpl(String name, String owner) {
         this.name = name;
         this.owner = owner;
-        this.isOpen = isOpen;
+    }
+
+    public Map<Long, ShopEntry> getProducts() {
+        return products;
     }
 
     @Override
