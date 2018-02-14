@@ -1,7 +1,9 @@
 package com.codecool.plaza.api;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class ShopImpl implements Shop{
 
@@ -54,26 +56,59 @@ public class ShopImpl implements Shop{
 
     @Override
     public boolean hasProduct(long barcode) throws ShopIsClosedException {
+        if (products.keySet().contains(barcode)) {
+            return true;
+        }
         return false;
     }
 
     @Override
     public void addNewProduct(Product product, int quantity, float price) throws ProductAlreadyExistsException, ShopIsClosedException {
-
+        Random rand = new Random();
+        while (true) {
+            int newBarcode = rand.nextInt(99000) + 10000;
+            if (!hasProduct(newBarcode)) {
+                ShopEntry newProduct = new ShopEntry(product, quantity, price);
+                products.put((long) newBarcode, newProduct);
+                break;
+            }
+        }
     }
 
     @Override
     public void addProduct(long barcode, int quantity) throws NoSuchProductException, ShopIsClosedException {
-
+        if (hasProduct(barcode)) {
+            for (Long productBarcode: products.keySet()) {
+                if (productBarcode == barcode) {
+                    products.get(productBarcode).increaseQuantity(quantity);
+                }
+            }
+        }
     }
 
     @Override
     public Product buyProduct(long barcode) throws NoSuchProductException, OutOfStockException, ShopIsClosedException {
+        if (hasProduct(barcode)) {
+            if (products.get(barcode).getQuantity() > 0) {
+                products.get(barcode).decreaseQuantity(1);
+                return products.get(barcode).getProduct();
+            }
+        }
         return null;
     }
 
     @Override
     public List<Product> buyProducts(long barcode, int quantity) throws NoSuchProductException, OutOfStockException, ShopIsClosedException {
+        List<Product> boughtProduct = new ArrayList<>();
+        if (hasProduct(barcode)) {
+            if (products.get(barcode).getQuantity() > quantity) {
+                products.get(barcode).decreaseQuantity(quantity);
+                for (int i = 0; i < quantity; i++) {
+                    boughtProduct.add(products.get(barcode).getProduct());
+                }
+                return boughtProduct;
+            }
+        }
         return null;
     }
 
