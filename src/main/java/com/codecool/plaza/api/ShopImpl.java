@@ -1,9 +1,9 @@
 package com.codecool.plaza.api;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 public class ShopImpl implements Shop{
 
@@ -15,6 +15,7 @@ public class ShopImpl implements Shop{
     public ShopImpl(String name, String owner) {
         this.name = name;
         this.owner = owner;
+        this.products = new HashMap<>();
     }
 
     public Map<Long, ShopEntry> getProducts() {
@@ -50,10 +51,9 @@ public class ShopImpl implements Shop{
     public Product findByName(String name) throws ShopIsClosedException {
         if (!this.isOpen) { throw new ShopIsClosedException("Shop is closed!"); }
 
-        List<ShopEntry> productsShopEntries = (List<ShopEntry>) products.values();
-        for (int i = 0; i < productsShopEntries.size(); i++) {
-            if (productsShopEntries.get(i).getProduct().getName().equals(name)) {
-                return productsShopEntries.get(i).getProduct();
+        for (Long barcode: products.keySet()) {
+            if (products.get(barcode).getProduct().getName().equals(name)) {
+                return products.get(barcode).getProduct();
             }
         }
         return null;
@@ -73,14 +73,12 @@ public class ShopImpl implements Shop{
     public void addNewProduct(Product product, int quantity, float price) throws ProductAlreadyExistsException, ShopIsClosedException {
         if (!this.isOpen) { throw new ShopIsClosedException("Shop is closed!"); }
 
-        Random rand = new Random();
         while (true) {
-            int newBarcode = rand.nextInt(99000) + 10000;
-            if (hasProduct(newBarcode)) {
+            if (hasProduct(product.getBarcode())) {
                 throw new ProductAlreadyExistsException("This product is already exist!");
             } else {
                 ShopEntry newProduct = new ShopEntry(product, quantity, price);
-                products.put((long) newBarcode, newProduct);
+                products.put(product.getBarcode(), newProduct);
                 break;
             }
         }
@@ -133,7 +131,7 @@ public class ShopImpl implements Shop{
         throw new NoSuchProductException("There is no such product!");
     }
 
-    class ShopEntry {
+    public class ShopEntry {
 
         private Product product;
         private int quantity;
