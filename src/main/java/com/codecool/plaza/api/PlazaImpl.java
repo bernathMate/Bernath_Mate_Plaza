@@ -17,27 +17,27 @@ public class PlazaImpl implements Plaza{
 
     @Override
     public List<Shop> getShops() throws PlazaIsClosedException {
-        if (!this.isOpen()) { throw new PlazaIsClosedException("Plaza is closed!"); }
+        if (!this.isOpen) { throw new PlazaIsClosedException("Plaza is closed!"); }
         return shops;
     }
 
     @Override
     public void addShop(Shop shop) throws ShopAlreadyExistsException, PlazaIsClosedException {
-        if (!this.isOpen()) { throw new PlazaIsClosedException("Plaza is closed!"); }
+        if (!this.isOpen) { throw new PlazaIsClosedException("Plaza is closed!"); }
         if (this.shops.contains(shop)) { throw new ShopAlreadyExistsException("This shop is already exist!"); }
         shops.add(shop);
     }
 
     @Override
     public void removeShop(Shop shop) throws NoSuchShopException, PlazaIsClosedException {
-        if (!this.isOpen()) { throw new PlazaIsClosedException("Plaza is closed!"); }
+        if (!this.isOpen) { throw new PlazaIsClosedException("Plaza is closed!"); }
         if (!this.shops.contains(shop)) { throw new NoSuchShopException("There is no such shop!"); }
         shops.remove(shop);
     }
 
     @Override
     public Shop findShopByName(String name) throws NoSuchShopException, PlazaIsClosedException {
-        if (!this.isOpen()) { throw new PlazaIsClosedException("Plaza is closed!"); }
+        if (!this.isOpen) { throw new PlazaIsClosedException("Plaza is closed!"); }
 
         for (Shop shop: shops) {
             if (shop.getName().equals(name)) {
