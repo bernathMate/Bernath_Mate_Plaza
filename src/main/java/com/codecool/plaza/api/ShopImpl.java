@@ -131,7 +131,21 @@ public class ShopImpl implements Shop{
         throw new NoSuchProductException("There is no such product!");
     }
 
-    public class ShopEntry {
+    public List<Product> getAllProduct() throws ShopIsClosedException{
+        if (!this.isOpen) { throw new ShopIsClosedException("Shop is closed!"); }
+
+        List<Product> allProduct = new ArrayList<>();
+        for (Long barcode: products.keySet()) {
+            allProduct.add(products.get(barcode).getProduct());
+        }
+        return allProduct;
+    }
+
+    public float getPrice(long barcode) {
+        return this.products.get(barcode).getPrice();
+    }
+
+    private class ShopEntry {
 
         private Product product;
         private int quantity;
