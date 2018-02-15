@@ -5,14 +5,11 @@ import com.codecool.plaza.api.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Scanner;
+import java.util.*;
 
 public class CmdProgram {
 
-    private List<Product> cart;
+    private List<Product> cart = new ArrayList<>();
     private String[] args;
     private Scanner sc = new Scanner(System.in);
     private PlazaImpl plaza;
@@ -33,6 +30,31 @@ public class CmdProgram {
         }
 
         handlePlazaMenu();
+    }
+
+    private void cartProductsPrice() {
+        float totalPrice = 0;
+
+        try {
+            List<Product> allProducts = shop.getAllProduct();
+            for(Product product: allProducts) {
+                float actualPrice = shop.getPrice(product.getBarcode());
+                totalPrice += actualPrice;
+            }
+        } catch (ShopIsClosedException e) {
+            System.out.println("This shop is closed!");
+        }
+        System.out.println("Total price: " + totalPrice);
+    }
+
+    private void printCartContent() {
+        System.out.println("Cart content: ");
+        if (cart.isEmpty()) {
+            System.out.println(" (cart is empty)");
+        }
+        for (Product product: cart) {
+            System.out.println(" - " + product.getName());
+        }
     }
 
     private void handlePlazaMenu() throws NoSuchShopException, PlazaIsClosedException, ParseException {
@@ -67,7 +89,10 @@ public class CmdProgram {
                 System.out.println("Invalid command, please give a correct command!");
             }
         }
+        printCartContent();
+        cartProductsPrice();
         System.out.println("Have a nice day, goodbye!");
+        System.exit(0);
     }
 
     private void handCreatePlaza() {
@@ -193,10 +218,14 @@ public class CmdProgram {
             System.out.println("There is no products!");
         } else {
             System.out.println("Products: ");
-            for(Long barcode: shop.getProducts().keySet()) {
-                System.out.println(" - " + shop.getProducts().get(barcode).getProduct().getName());
+            try {
+                for(Product product: shop.getAllProduct()) {
+                    System.out.println(" - " + product.getName());
+                    System.out.println("\t barcode: " + product.getBarcode());
+                }
+            } catch (ShopIsClosedException e) {
+                System.out.println("This shop is closed!");
             }
-
         }
     }
 
@@ -208,6 +237,7 @@ public class CmdProgram {
             Product product = shop.findByName(productName);
             if (product == null) {
                 System.out.println("There is no such product!");
+                return;
             }
             System.out.println("Product details: " + product);
         } catch (ShopIsClosedException e) {
@@ -229,47 +259,61 @@ public class CmdProgram {
         System.out.println("Now, the shop is closed!");
     }
 
-    private Product createNewProduct() throws ParseException {
+    private Product createNewProduct() throws ParseException, InputMismatchException {
         Product newProduct = null;
         System.out.println("Type the new product's type: (Food or Clothing)");
         String productType = sc.nextLine();
 
-        if (productType.toLowerCase().equals("food")) {
-            System.out.println("Type the name: ");
-            String name = sc.nextLine();
-            System.out.println("Type the barcode: ");
-            long barcode = sc.nextLong();
-            System.out.println("Type the manufacturer: ");
-            sc.nextLine();
-            String manufacturer = sc.nextLine();
-            System.out.println("Type the calories: ");
-            int calories = sc.nextInt();
-            System.out.println("Type the expiration date: (yyyy/MM/dd)");
-            sc.nextLine();
-            String dateAsString = sc.nextLine();
-            DateFormat format = new SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH);
-            Date date = format.parse(dateAsString);
-            newProduct = new FoodProduct(name, barcode, manufacturer, calories, date);
-        } else if (productType.toLowerCase().equals("clothing")) {
-            System.out.println("Type the name: ");
-            String name = sc.nextLine();
-            System.out.println("Type the barcode: ");
-            long barcode = sc.nextLong();
-            System.out.println("Type the manufacturer: ");
-            sc.nextLine();
-            String manufacturer = sc.nextLine();
-            System.out.println("Type the material: ");
-            String material = sc.nextLine();
-            System.out.println("Type the type: ");
-            String type = sc.nextLine();
-            newProduct = new ClothingProduct(name, barcode, manufacturer, material, type);
+        switch (productType.toLowerCase()) {
+            case "food": {
+                System.out.println("Type the name: ");
+                String name = sc.nextLine();
+                System.out.println("Type the barcode: ");
+                long barcode = sc.nextLong();
+                System.out.println("Type the manufacturer: ");
+                sc.nextLine();
+                String manufacturer = sc.nextLine();
+                System.out.println("Type the calories: ");
+                int calories = sc.nextInt();
+                System.out.println("Type the expiration date: (yyyy/MM/dd)");
+                sc.nextLine();
+                String dateAsString = sc.nextLine();
+                DateFormat format = new SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH);
+                Date date = format.parse(dateAsString);
+                newProduct = new FoodProduct(name, barcode, manufacturer, calories, date);
+                break;
+            }
+            case "clothing": {
+                System.out.println("Type the name: ");
+                String name = sc.nextLine();
+                System.out.println("Type the barcode: ");
+                long barcode = sc.nextLong();
+                System.out.println("Type the manufacturer: ");
+                sc.nextLine();
+                String manufacturer = sc.nextLine();
+                System.out.println("Type the material: ");
+                String material = sc.nextLine();
+                System.out.println("Type the type: ");
+                String type = sc.nextLine();
+                newProduct = new ClothingProduct(name, barcode, manufacturer, material, type);
+                break;
+            }
+            default:
+                throw new InputMismatchException();
         }
 
         return newProduct;
     }
 
     private void handleAddNewProduct() throws ParseException {
-        Product newProduct = createNewProduct();
+        Product newProduct = null;
+        try {
+            newProduct = createNewProduct();
+        } catch (InputMismatchException ime) {
+            System.out.println("Invalid type!");
+            return;
+        }
+
         System.out.println("Type the quantity: ");
         int quantity = sc.nextInt();
         System.out.println("Type the price: ");
@@ -277,6 +321,7 @@ public class CmdProgram {
 
         try {
             shop.addNewProduct(newProduct, quantity, price);
+            System.out.println("New product is added!");
         } catch (ProductAlreadyExistsException e) {
             System.out.println("This product is already exist!");
         } catch (ShopIsClosedException e) {
@@ -285,8 +330,34 @@ public class CmdProgram {
     }
 
     private void handleAddProduct() {
+        System.out.println("Type the product's barcode: ");
+        long barcode = sc.nextLong();
+        System.out.println("Type the quantity: ");
+        int quantity = sc.nextInt();
+
+        try {
+            shop.addProduct(barcode, quantity);
+            System.out.println("Product is added!");
+        } catch (NoSuchProductException e) {
+            System.out.println("There is no such product!");
+        } catch (ShopIsClosedException e) {
+            System.out.println("Shop is closed!");
+        }
     }
 
     private void handleBuyProductByBarcode() {
+        System.out.println("Type the product's barcode: ");
+        long barcode = sc.nextLong();
+
+        try {
+            cart.add(shop.buyProduct(barcode));
+            System.out.println("This product is added to the cart!");
+        } catch (NoSuchProductException e) {
+            System.out.println("There is no such product!");
+        } catch (ShopIsClosedException e) {
+            System.out.println("Shop is closed");
+        } catch (OutOfStockException e) {
+            System.out.println("This product is out of stock!");
+        }
     }
 }
