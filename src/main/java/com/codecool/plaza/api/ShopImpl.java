@@ -131,6 +131,7 @@ public class ShopImpl implements Shop{
         throw new NoSuchProductException("There is no such product!");
     }
 
+    @Override
     public List<Product> getAllProduct() throws ShopIsClosedException{
         if (!this.isOpen) { throw new ShopIsClosedException("Shop is closed!"); }
 
@@ -141,6 +142,7 @@ public class ShopImpl implements Shop{
         return allProduct;
     }
 
+    @Override
     public float getPrice(long barcode) {
         return this.products.get(barcode).getPrice();
     }
