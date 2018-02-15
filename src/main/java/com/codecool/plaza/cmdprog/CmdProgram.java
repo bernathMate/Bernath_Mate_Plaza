@@ -269,33 +269,30 @@ public class CmdProgram {
                 System.out.println("Type the name: ");
                 String name = sc.nextLine();
                 System.out.println("Type the barcode: ");
-                long barcode = sc.nextLong();
+                String barcode = sc.nextLine();
                 System.out.println("Type the manufacturer: ");
-                sc.nextLine();
                 String manufacturer = sc.nextLine();
                 System.out.println("Type the calories: ");
-                int calories = sc.nextInt();
+                String calories = sc.nextLine();
                 System.out.println("Type the expiration date: (yyyy/MM/dd)");
-                sc.nextLine();
                 String dateAsString = sc.nextLine();
                 DateFormat format = new SimpleDateFormat("yyyy/MM/dd", Locale.ENGLISH);
                 Date date = format.parse(dateAsString);
-                newProduct = new FoodProduct(name, barcode, manufacturer, calories, date);
+                newProduct = new FoodProduct(name, Long.parseLong(barcode), manufacturer, Integer.parseInt(calories), date);
                 break;
             }
             case "clothing": {
                 System.out.println("Type the name: ");
                 String name = sc.nextLine();
                 System.out.println("Type the barcode: ");
-                long barcode = sc.nextLong();
+                String barcode = sc.nextLine();
                 System.out.println("Type the manufacturer: ");
-                sc.nextLine();
                 String manufacturer = sc.nextLine();
                 System.out.println("Type the material: ");
                 String material = sc.nextLine();
                 System.out.println("Type the type: ");
                 String type = sc.nextLine();
-                newProduct = new ClothingProduct(name, barcode, manufacturer, material, type);
+                newProduct = new ClothingProduct(name, Long.parseLong(barcode), manufacturer, material, type);
                 break;
             }
             default:
@@ -315,12 +312,12 @@ public class CmdProgram {
         }
 
         System.out.println("Type the quantity: ");
-        int quantity = sc.nextInt();
+        String quantity = sc.nextLine();
         System.out.println("Type the price: ");
-        float price = sc.nextFloat();
+        String price = sc.nextLine();
 
         try {
-            shop.addNewProduct(newProduct, quantity, price);
+            shop.addNewProduct(newProduct, Integer.parseInt(quantity), Float.parseFloat(price));
             System.out.println("New product is added!");
         } catch (ProductAlreadyExistsException e) {
             System.out.println("This product is already exist!");
@@ -331,12 +328,12 @@ public class CmdProgram {
 
     private void handleAddProduct() {
         System.out.println("Type the product's barcode: ");
-        long barcode = sc.nextLong();
+        String barcode = sc.nextLine();
         System.out.println("Type the quantity: ");
-        int quantity = sc.nextInt();
+        String quantity = sc.nextLine();
 
         try {
-            shop.addProduct(barcode, quantity);
+            shop.addProduct(Long.parseLong(barcode), Integer.parseInt(quantity));
             System.out.println("Product is added!");
         } catch (NoSuchProductException e) {
             System.out.println("There is no such product!");
@@ -347,10 +344,10 @@ public class CmdProgram {
 
     private void handleBuyProductByBarcode() {
         System.out.println("Type the product's barcode: ");
-        long barcode = sc.nextLong();
+        String barcode = sc.nextLine();
 
         try {
-            cart.add(shop.buyProduct(barcode));
+            cart.add(shop.buyProduct(Long.parseLong(barcode)));
             System.out.println("This product is added to the cart!");
         } catch (NoSuchProductException e) {
             System.out.println("There is no such product!");
